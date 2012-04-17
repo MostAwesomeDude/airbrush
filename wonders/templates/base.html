@@ -1,0 +1,19 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="/static/css/base.css" type="text/css" />
+    {% block head %}{% endblock %}
+</head>
+
+<body>
+
+<div id="page">
+    <div id="outer_wrapper">
+        <div id="wrapper">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
