@@ -1,3 +1,5 @@
+from __future__ import with_statement
+
 from flask import Flask, abort
 from flask.ext.holster.main import init_holster
 from flask.ext.holster.simple import html
@@ -9,7 +11,8 @@ app.debug = True
 init_holster(app)
 
 w = Wonders()
-w.load_wonders("wonders/wonders.txt")
+f = app.open_resource("wonders/wonders.txt")
+w.load_wonders(f)
 
 @app.holster("/wonders")
 @app.holster("/wonders/<int:n>")

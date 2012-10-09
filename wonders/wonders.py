@@ -1,5 +1,3 @@
-from __future__ import with_statement
-
 import random
 
 def prettify(s):
@@ -13,11 +11,10 @@ class Wonders(object):
     def __init__(self):
         self.wonders = []
 
-    def load_wonders(self, path):
-        with open(path) as f:
-            for line in f:
-                digits, rest = line.split(" ", 1)
-                self.wonders.append(rest.strip())
+    def load_wonders(self, f):
+        for line in f:
+            digits, rest = line.split(" ", 1)
+            self.wonders.append(rest.strip())
 
     def random(self):
         r = random.randint(0, len(self.wonders))
