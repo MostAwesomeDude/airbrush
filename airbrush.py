@@ -1,6 +1,7 @@
 from __future__ import with_statement
 
 from flask import Flask, abort
+from flask.ext.holster.helpers import lift
 from flask.ext.holster.main import init_holster
 from flask.ext.holster.simple import html
 
@@ -14,8 +15,14 @@ w = Wonders()
 f = app.open_resource("wonders/wonders.txt")
 w.load_wonders(f)
 
-@app.holster("/wonders")
-@app.holster("/wonders/<int:n>")
+def no_cache(response):
+    response.cache_control.no_cache = True
+    return response
+
+@app.bare_holster("/wonders")
+@app.bare_holster("/wonders/<int:n>")
+@lift(no_cache)
+@app.holsterize
 @html("wonders.html")
 def wonders(n=None):
     if n is None:
