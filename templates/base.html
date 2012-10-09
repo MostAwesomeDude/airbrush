@@ -1,19 +1,18 @@
 <html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta charset="utf-8" />
+        <link rel="stylesheet" href="/static/css/base.css" type="text/css" />
+        {% block head %}{% endblock %}
+    </head>
 
-<head>
-    <link rel="stylesheet" href="/static/css/base.css" type="text/css" />
-    {% block head %}{% endblock %}
-</head>
-
-<body>
-
-<div id="page">
-    <div id="outer_wrapper">
-        <div id="wrapper">
-            {% block content %}{% endblock %}
+    <body>
+        <div id="page">
+            <div id="outer_wrapper">
+                <div id="wrapper">
+                    {% block content %}{% endblock %}
+                </div>
+            </div>
         </div>
-    </div>
-</div>
-
-</body>
+    </body>
 </html>
