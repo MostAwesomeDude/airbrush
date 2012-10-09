@@ -5,8 +5,8 @@ from flask import Flask, render_template, abort
 
 class Wonders(object):
 
-    def __init__(self):
-        self.load_wonders('./wonders.txt')
+    def __init__(self, path):
+        self.load_wonders(path)
 
     def load_wonders(self, path):
         self.wonders = []
