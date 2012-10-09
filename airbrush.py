@@ -1,6 +1,6 @@
 from __future__ import with_statement
 
-from flask import Flask, abort
+from flask import Flask, abort, url_for
 from flask.ext.holster.helpers import lift
 from flask.ext.holster.main import init_holster
 from flask.ext.holster.simple import html
@@ -42,4 +42,15 @@ def wonders(n=None):
     return {
         "effect": prettify(effect),
         "number": n,
+    }
+
+@app.holster("/")
+@html("index.html")
+def index():
+    return {
+        "stuff": {
+            "dnd": {
+                "wonders": url_for("wonders", _external=True),
+            },
+        },
     }

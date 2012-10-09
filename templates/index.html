@@ -1,0 +1,17 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta charset="utf-8" />
+{% macro dump(d) %}
+    <ul>
+    {% for k in d %}
+        {% set v = d[k] %}
+        <li>{{ k }}:
+            {% if v is mapping %}
+            <ul>{{ dump(v) }}</ul>
+            {% else %}
+            {{ v|e|urlize }}
+            {% endif %}
+        </li>
+    {% endfor %}
+    </ul>
+{% endmacro %}
+{{ dump(d) }}
