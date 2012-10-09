@@ -1,4 +1,5 @@
-#!/usr/bin/python2
+from __future__ import with_statement
+
 import random
 
 def prettify(s):
