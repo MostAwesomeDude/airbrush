@@ -2,7 +2,6 @@
 import sys
 import random
 from flask import Flask, render_template, abort
-from pprint import pprint
 
 class Wonders(object):
 
@@ -62,4 +61,3 @@ if __name__ == '__main__':
     else:
         print('Usage: {0} command'.format(sys.argv[0]))
         sys.exit(1)
-
