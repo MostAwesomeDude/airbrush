@@ -1,2 +1,2 @@
 Flask>=0.9
-Flask-Holster>=0.1.2
+Flask-Holster>=0.2
