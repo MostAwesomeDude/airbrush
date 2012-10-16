@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <div class="number">{{ d.number }}</div>
-    <div class="effect">{{ d.effect }}</div>
+<div class="number">
+    <a href="{{ url_for("wonders", n=d.number) }}">{{ d.number }}</a>
+</div>
+<div class="effect">{{ d.effect }}</div>
 {% endblock %}
