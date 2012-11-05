@@ -26,12 +26,11 @@ body {
     border-radius: 15px;
     background-color: #FBFDF1;
 
-    font-family: 'Princess Sofia', cursive;
+    font-family: "Princess Sofia", sans-serif;
     font-size: 45px;
     line-height: 90px;
 
     position: relative;
-
 }
 
 .number {
