@@ -1,6 +1,6 @@
 from __future__ import with_statement
 
-from flask import Flask, abort, url_for
+from flask import Flask, abort, redirect, request, url_for
 from flask.ext.holster.helpers import lift
 from flask.ext.holster.main import init_holster
 from flask.ext.holster.simple import html
@@ -44,6 +44,21 @@ def wonders(n=None):
         "number": n,
     }
 
+@app.holster("/elements", methods=["GET", "POST"])
+@html("elements.html")
+def elements():
+    if request.method == "POST":
+        s = request.form["word"].strip().lower()
+        return redirect(url_for("show_element", word=s))
+
+    return {}
+
+@app.holster("/elements/<word>")
+@html("show_element.html")
+def show_element(word):
+    from elements import match_word
+    return {"matches": match_word(word)}
+
 @app.holster("/")
 @html("index.html")
 def index():
@@ -51,6 +66,9 @@ def index():
         "stuff": {
             "dnd": {
                 "wonders": url_for("wonders", _external=True),
+            },
+            "words": {
+                "elements": url_for("elements", _external=True),
             },
         },
     }
