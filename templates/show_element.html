@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="effect">
+    <ul>
+        {% for match in d.matches %}
+        <li>{{ match }}</li>
+        {% else %}
+        <li>No matches found!</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
