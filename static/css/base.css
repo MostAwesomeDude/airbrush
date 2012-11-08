@@ -49,3 +49,10 @@ body {
     vertical-align: middle;
     text-align: center;
 }
+
+.element {
+    border-color: #000000;
+    border-style: solid;
+    border-width: 2px;
+    padding: 8px;
+}

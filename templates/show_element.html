@@ -4,7 +4,11 @@
 <div class="effect">
     <ul>
         {% for match in d.matches %}
-        <li>{{ match }}</li>
+        <li>
+        {% for element in match %}
+        <span class="element">{{ element }}</span>
+        {% endfor %}
+        </li>
         {% else %}
         <li>No matches found!</li>
         {% endfor %}
