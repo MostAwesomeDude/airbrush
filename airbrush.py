@@ -57,7 +57,9 @@ def elements():
 @html("show_element.html")
 def show_element(word):
     from elements import match_word
-    return {"matches": match_word(word)}
+    matches = match_word(word)
+    matches = [[x.capitalize() for x in match] for match in matches]
+    return {"matches": matches}
 
 @app.holster("/")
 @html("index.html")
