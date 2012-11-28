@@ -2,13 +2,13 @@ from __future__ import division
 
 from collections import defaultdict
 import random
+from urllib import urlopen
 
-import requests
 from lxml.html.soupparser import fromstring
 
 def make_chains():
-    page = requests.get("http://timecube.com/")
-    tree = fromstring(page.text)
+    page = urlopen("http://timecube.com/")
+    tree = fromstring(page.read())
     chains = defaultdict(list)
 
     l = []
