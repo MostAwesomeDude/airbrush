@@ -6,6 +6,7 @@ from flask.ext.holster.main import init_holster
 from flask.ext.holster.simple import html
 
 from wonders.wonders import Wonders, prettify
+from tipsum import make_chains, make_text
 
 app = Flask(__name__)
 app.debug = True
@@ -61,6 +62,16 @@ def show_element(word):
     matches = [[x.capitalize() for x in match] for match in matches]
     return {"matches": matches}
 
+chains = make_chains()
+
+@app.bare_holster("/tipsum")
+@app.bare_holster("/tipsum/<int:length>")
+@lift(no_cache)
+@app.holsterize
+@html("tipsum.html")
+def tipsum(length=42):
+    return {"tipsum": make_text(chains, length)}
+
 @app.holster("/")
 @html("index.html")
 def index():
@@ -71,6 +82,7 @@ def index():
             },
             "words": {
                 "elements": url_for("elements", _external=True),
+                "tipsum": url_for("tipsum", _external=True),
             },
         },
     }
