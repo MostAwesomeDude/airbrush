@@ -16,7 +16,11 @@ def make_chains():
     for span in tree.xpath("//span"):
         contents = span.text_content().strip()
         for word in contents.split():
-            if word:
+            # There will be a couple "words" that are either NBSPs or
+            # punctuation-based HRs/BRs. Discard them with a length-based
+            # heuristic.
+            word = word.strip()
+            if word and len(word) < 25:
                 l.append(unicode(word.strip()))
 
     for i, word in enumerate(l[:-3]):
