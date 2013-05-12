@@ -57,3 +57,9 @@ body {
     border-width: 2px;
     padding: 8px;
 }
+
+.tipsum {
+    font-size: 36pt;
+    text-align: center;
+    width: 70%;
+}

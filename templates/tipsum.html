@@ -1,9 +1,13 @@
-{% extends "base.html" %}
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta charset="utf-8" />
+        <link rel="stylesheet" href="/static/css/base.css" type="text/css" />
+    </head>
 
-{% block content %}
-<div class="tipsum">
-    <blockquote>
-        {{ d.tipsum|join(" ") }}
-    </blockquote>
-</div>
-{% endblock %}
+    <body>
+        <div class="tipsum">
+            {{ d.tipsum|join(" ") }}
+        </div>
+    </body>
+</html>
