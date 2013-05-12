@@ -62,15 +62,19 @@ def show_element(word):
     matches = [[x.capitalize() for x in match] for match in matches]
     return {"matches": matches}
 
-chains = make_chains()
+heads, chains = make_chains()
 
 @app.bare_holster("/tipsum")
 @app.bare_holster("/tipsum/<int:length>")
 @lift(no_cache)
 @app.holsterize
 @html("tipsum.html")
-def tipsum(length=42):
-    return {"tipsum": make_text(chains, length)}
+def tipsum(length=3):
+    sentences = []
+    for i in range(length):
+        words = make_text(heads, chains)
+        sentences.append(u" ".join(words))
+    return {"tipsum": sentences}
 
 @app.holster("/")
 @html("index.html")
