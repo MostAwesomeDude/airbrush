@@ -31,7 +31,7 @@ def make_chains():
             # Save this word.
             l.append(unicode(word.strip()))
 
-            if word.endswith("."):
+            if word.endswith(".") and word.lower() != "Dr.":
                 # This ends a sentence; push a marker onto the stream.
                 l.append(EOS)
 
