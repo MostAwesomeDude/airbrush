@@ -8,6 +8,19 @@ from lxml.html.soupparser import fromstring
 
 EOS = object()
 
+def is_eos(word):
+    """
+    Classify a word as being at the end of a sentence.
+    """
+
+    if word.endswith("?"):
+        return True
+    if word.endswith(".\""):
+        return True
+
+    dots = "dr.", "b."
+    return word.endswith(".") and word.lower() not in dots
+
 def make_chains():
     page = urlopen("http://timecube.com/")
     tree = fromstring(page.read())
@@ -31,8 +44,7 @@ def make_chains():
             # Save this word.
             l.append(unicode(word.strip()))
 
-            dots = ("dr.", "b.")
-            if word.endswith(".") and word.lower() not in dots:
+            if is_eos(word):
                 # This ends a sentence; push a marker onto the stream.
                 l.append(EOS)
 
