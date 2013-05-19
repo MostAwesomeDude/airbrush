@@ -21,10 +21,10 @@ def is_eos(word):
     dots = "dr.", "b."
     return word.endswith(".") and word.lower() not in dots
 
-def make_chains():
+
+def make_stream():
     page = urlopen("http://timecube.com/")
     tree = fromstring(page.read())
-    chains = defaultdict(list)
 
     l = []
 
@@ -48,6 +48,12 @@ def make_chains():
                 # This ends a sentence; push a marker onto the stream.
                 l.append(EOS)
 
+    return l
+
+
+def parse_chains(l):
+
+    chains = defaultdict(list)
     heads = []
     iterator = enumerate(l[:-3])
 
@@ -65,6 +71,12 @@ def make_chains():
             chains[chain].append(l[i + 3])
 
     return heads, dict(chains)
+
+
+def make_chains():
+    l = make_stream()
+    return parse_chains(l)
+
 
 def make_text(heads, chains):
     l = [random.choice(heads)]
