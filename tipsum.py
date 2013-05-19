@@ -55,20 +55,19 @@ def parse_chains(l):
 
     chains = defaultdict(list)
     heads = []
-    iterator = enumerate(l[:-3])
+    iterator = enumerate(l[:-2])
 
     for i, word in iterator:
         if word is EOS:
             # Set up a head and append a partial chain.
             heads.append(l[i + 1])
-            chains[l[i + 1], l[i + 2]].append(l[i + 3])
             chains[l[i + 1],].append(l[i + 2])
-        elif EOS in l[i + 1:i + 3]:
+        elif EOS in l[i + 1:i + 2]:
             # Just pump it away.
             continue
         else:
-            chain = word, l[i + 1], l[i + 2]
-            chains[chain].append(l[i + 3])
+            chain = word, l[i + 1]
+            chains[chain].append(l[i + 2])
 
     return heads, dict(chains)
 
@@ -81,7 +80,7 @@ def make_chains():
 def make_text(heads, chains):
     l = [random.choice(heads)]
     while True:
-        t = tuple(l[-3:])
+        t = tuple(l[-2:])
         choice = random.choice(chains[t])
         if choice is EOS:
             break
