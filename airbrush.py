@@ -7,6 +7,7 @@ from flask.ext.holster.helpers import lift
 from flask.ext.holster.main import init_holster
 from flask.ext.holster.simple import html
 
+from analyze import champ_stat_at
 from lol import get_champ_stats
 from tipsum import make_chains, make_text
 from wonders.wonders import Wonders, prettify
@@ -16,6 +17,13 @@ app.debug = True
 init_holster(app)
 
 cache = SimpleCache()
+
+def get_champions():
+    champs = cache.get("champions")
+    if not champs:
+        champs = get_champ_stats()
+        cache.set("champions", champs)
+    return champs
 
 w = Wonders()
 f = app.open_resource("wonders/wonders.txt")
@@ -84,22 +92,51 @@ def tipsum(length=3):
 
 @app.holster("/lol/raw")
 def lol_raw():
-    champions = cache.get("champions")
-    if not champions:
-        champions = get_champ_stats()
-        cache.set("champions", champions)
+    champions = get_champions()
     return champions
 
 
 @app.holster("/lol/raw/<champ>")
 def lol_raw_champ(champ):
-    champions = cache.get("champions")
-    if not champions:
-        champions = get_champ_stats()
-        cache.set("champions", champions)
+    champions = get_champions()
     if champ not in champions:
         abort(404)
     return champions[champ]
+
+
+@app.holster("/lol/cooked/<champ>")
+def lol_cooked_champ(champ):
+    champions = get_champions()
+    if champ not in champions:
+        abort(404)
+
+    c = champions[champ]
+
+    d = {
+        "Champion": champ,
+        "Range": c["range"],
+        "Movement Speed": c["ms"],
+    }
+    stats = {
+        "ad": "Attack Damage",
+        "as": "Attack Speed",
+        "armor": "Armor",
+        "mr": "Magic Resistance",
+        "health": "Health",
+        "mana": "Mana",
+        "hregen": "Health Regeneration",
+        "mregen": "Mana Regeneration",
+    }
+
+    for stat in stats:
+        starting = champ_stat_at(c, stat, 1)
+        ending = champ_stat_at(c, stat, 18)
+        skey = "%s at Level 1" % stats[stat]
+        ekey = "%s at Level 18" % stats[stat]
+        d[skey] = starting
+        d[ekey] = ending
+
+    return d
 
 
 @app.holster("/")
