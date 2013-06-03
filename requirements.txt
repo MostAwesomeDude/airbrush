@@ -1,2 +1,5 @@
-Flask>=0.9
+BeautifulSoup
 Flask-Holster>=0.2.3
+Flask>=0.9
+lxml
+requests
