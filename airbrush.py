@@ -130,9 +130,14 @@ def lol_cooked_champ(champ):
 
     for stat in stats:
         starting = champ_stat_at(c, stat, 1)
+        if starting == 0 and stat in ("mana", "mregen"):
+            # Manaless champion.
+            continue
         ending = champ_stat_at(c, stat, 18)
+
         skey = "%s at Level 1" % stats[stat]
         ekey = "%s at Level 18" % stats[stat]
+
         d[skey] = starting
         d[ekey] = ending
 
