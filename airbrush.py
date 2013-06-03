@@ -81,13 +81,26 @@ def tipsum(length=3):
         sentences.append(u" ".join(words))
     return {"tipsum": sentences}
 
-@app.holster("/lol")
-def lol():
+
+@app.holster("/lol/raw")
+def lol_raw():
     champions = cache.get("champions")
     if not champions:
         champions = get_champ_stats()
         cache.set("champions", champions)
     return champions
+
+
+@app.holster("/lol/raw/<champ>")
+def lol_raw_champ(champ):
+    champions = cache.get("champions")
+    if not champions:
+        champions = get_champ_stats()
+        cache.set("champions", champions)
+    if champ not in champions:
+        abort(404)
+    return champions[champ]
+
 
 @app.holster("/")
 @html("index.html")
