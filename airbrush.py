@@ -1,16 +1,21 @@
 from __future__ import with_statement
 
+from werkzeug.contrib.cache import SimpleCache
+
 from flask import Flask, abort, redirect, request, url_for
 from flask.ext.holster.helpers import lift
 from flask.ext.holster.main import init_holster
 from flask.ext.holster.simple import html
 
-from wonders.wonders import Wonders, prettify
+from lol import get_champ_stats
 from tipsum import make_chains, make_text
+from wonders.wonders import Wonders, prettify
 
 app = Flask(__name__)
 app.debug = True
 init_holster(app)
+
+cache = SimpleCache()
 
 w = Wonders()
 f = app.open_resource("wonders/wonders.txt")
@@ -75,6 +80,14 @@ def tipsum(length=3):
         words = make_text(heads, chains)
         sentences.append(u" ".join(words))
     return {"tipsum": sentences}
+
+@app.holster("/lol")
+def lol():
+    champions = cache.get("champions")
+    if not champions:
+        champions = get_champ_stats()
+        cache.set("champions", champions)
+    return champions
 
 @app.holster("/")
 @html("index.html")
