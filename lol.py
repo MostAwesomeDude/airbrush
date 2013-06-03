@@ -21,7 +21,7 @@ def retrieve(name):
 def get_champ_stats():
     document = retrieve("Base_champion_statistics")
 
-    table = document.xpath("//table")[1]
+    table = document.xpath("//table")[0]
 # In the future, if you ever need the magic incantation to get the table
 # headers, try this: [i[0].text if i else i.text for i in table[0]]
     headers = [
@@ -37,15 +37,14 @@ def get_champ_stats():
         "range",
     ]
 
-    champions = []
+    champions = {}
 
     for row in table[1:]:
         d = {}
         # Champ name rule: Remove spaces and punctuation, and capitalize by hand.
-        champ = row[0][0][1][0].text.strip()
+        champ = row[0][0].text.strip()
         champ = champ.replace(" ", "").replace(".", "").replace("'", "")
         champ = champ[0].upper() + champ[1:]
-        d["champ"] = champ
         for label, cell in zip(headers, row[1:]):
             data = cell.text.strip()
             # AS per level is measured in percents.
@@ -54,7 +53,7 @@ def get_champ_stats():
             else:
                 data = float(data)
             d[label] = data
-        champions.append(d)
+        champions[champ] = d
 
     return champions
 
