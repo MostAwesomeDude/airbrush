@@ -1,5 +1,7 @@
 from __future__ import with_statement
 
+from collections import defaultdict
+
 from werkzeug.contrib.cache import SimpleCache
 
 from flask import Flask, abort, redirect, request, url_for
@@ -140,6 +142,29 @@ def lol_cooked_champ(champ):
 
         d[skey] = starting
         d[ekey] = ending
+
+    return d
+
+
+@app.holster("/lol/height-chart")
+def lol_height_chart():
+    champions = get_champions()
+
+    d = {}
+
+    total_healths = defaultdict(int)
+
+    for level in range(1, 19):
+        healths = {}
+        for champ in champions:
+            health = champ_stat_at(champions[champ], "health", level)
+            healths[champ] = health
+
+        for standing, champ in enumerate(sorted(healths,
+                                                key=lambda k: healths[k])):
+            total_healths[champ] += standing
+
+    d = sorted(total_healths, key=lambda k: total_healths[k])
 
     return d
 
