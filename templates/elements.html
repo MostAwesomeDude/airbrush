@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 
+{% macro item(i) %}
+    <li>"<a href="{{ url_for("show_element", word=i) }}">{{ i }}</a>"</li>
+{% endmacro %}
+
 {% block content %}
 <div>
     <form method="POST" action="{{ url_for("elements") }}">
@@ -7,5 +11,16 @@
         <input type="text" name="word" />
         <input type="submit" />
     </form>
+    <ul>
+        {{ item("arzrunite") }}
+        {{ item("barrenness") }}
+        {{ item("infinite") }}
+        {{ item("monophony") }}
+        {{ item("nonpossession") }}
+        {{ item("reverberate") }}
+        {{ item("thermophosphorescence") }}
+        {{ item("whippersnapper") }}
+        {{ item("xenon") }}
+    </ul>
 </div>
 {% endblock %}
