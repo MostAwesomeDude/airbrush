@@ -146,8 +146,8 @@ def lol_cooked_champ(champ):
     return d
 
 
-@app.holster("/lol/height-chart")
-def lol_height_chart():
+@app.holster("/lol/height-chart/<stat>")
+def lol_height_chart(stat):
     champions = get_champions()
 
     d = {}
@@ -157,7 +157,7 @@ def lol_height_chart():
     for level in range(1, 19):
         healths = {}
         for champ in champions:
-            health = champ_stat_at(champions[champ], "health", level)
+            health = champ_stat_at(champions[champ], stat, level)
             healths[champ] = health
 
         for standing, champ in enumerate(sorted(healths,
