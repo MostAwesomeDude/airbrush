@@ -187,6 +187,29 @@ def value_to_stddev(mean, stddev, value):
     return (value - mean) / stddev
 
 
+def stddev_to_percentile(stddev):
+    if stddev < -1.29:
+        return 0
+    elif stddev < -0.85:
+        return 10
+    elif stddev < -0.53:
+        return 20
+    elif stddev < -0.26:
+        return 30
+    elif stddev < 0:
+        return 40
+    elif stddev < 0.26:
+        return 50
+    elif stddev < 0.53:
+        return 60
+    elif stddev < 0.85:
+        return 70
+    elif stddev < 1.29:
+        return 80
+    else:
+        return 90
+
+
 @app.holster("/lol/stats/<stat>")
 def lol_stats(stat):
     champions = get_champions()
@@ -223,16 +246,21 @@ def lol_stats_champ(stat, champ):
     champ1value = champ_stat_at(champions[selected], stat, 1)
     champ18value = champ_stat_at(champions[selected], stat, 18)
 
+    champ1stddev = value_to_stddev(l1stats["mean"], l1stats["stddev"],
+                                   champ1value)
+    champ18stddev = value_to_stddev(l18stats["mean"], l18stats["stddev"],
+                                    champ18value)
+
     champ1stats = {
         "Value": champ1value,
-        "Stddev": value_to_stddev(l1stats["mean"], l1stats["stddev"],
-                                  champ1value),
+        "Stddev": champ1stddev,
+        "Percentile": stddev_to_percentile(champ1stddev),
     }
 
     champ18stats = {
         "Value": champ18value,
-        "Stddev": value_to_stddev(l18stats["mean"], l18stats["stddev"],
-                                  champ18value),
+        "Stddev": champ18stddev,
+        "Percentile": stddev_to_percentile(champ18stddev),
     }
 
     d = {
