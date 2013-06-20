@@ -1,6 +1,7 @@
 from __future__ import with_statement
 
 from collections import defaultdict
+from math import sqrt
 
 from werkzeug.contrib.cache import SimpleCache
 
@@ -150,8 +151,6 @@ def lol_cooked_champ(champ):
 def lol_height_chart(stat):
     champions = get_champions()
 
-    d = {}
-
     total_healths = defaultdict(int)
 
     for level in range(1, 19):
@@ -169,6 +168,40 @@ def lol_height_chart(stat):
     return d
 
 
+def calculate(values):
+
+    mean = sum(values) / len(values)
+
+    variance = (sum((mean - value) ** 2 for value in values)
+                / (len(values) - 1))
+    stddev = sqrt(variance)
+
+    rv = {
+        "mean": mean,
+        "variance": variance,
+        "stddev": stddev,
+    }
+    return rv
+
+
+@app.holster("/lol/stats/<stat>")
+def lol_stats(stat):
+    champions = get_champions()
+
+    level1 = {}
+    level18 = {}
+
+    for champ in champions:
+        level1[champ] = champ_stat_at(champions[champ], stat, 1)
+        level18[champ] = champ_stat_at(champions[champ], stat, 18)
+
+    d = {
+        "Level 1 Stats": calculate(level1.values()),
+        "Level 18 Stats": calculate(level18.values()),
+    }
+    return d
+
+
 @app.holster("/")
 @html("index.html")
 def index():
@@ -176,6 +209,8 @@ def index():
         "stuff": {
             "dnd": {
                 "wonders": url_for("wonders", _external=True),
+            },
+            "lol": {
             },
             "words": {
                 "elements": url_for("elements", _external=True),
