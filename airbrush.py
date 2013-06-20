@@ -169,7 +169,6 @@ def lol_height_chart(stat):
 
 
 def calculate(values):
-
     mean = sum(values) / len(values)
 
     variance = (sum((mean - value) ** 2 for value in values)
@@ -182,6 +181,10 @@ def calculate(values):
         "stddev": stddev,
     }
     return rv
+
+
+def value_to_stddev(mean, stddev, value):
+    return (value - mean) / stddev
 
 
 @app.holster("/lol/stats/<stat>")
@@ -198,6 +201,47 @@ def lol_stats(stat):
     d = {
         "Level 1 Stats": calculate(level1.values()),
         "Level 18 Stats": calculate(level18.values()),
+    }
+    return d
+
+
+@app.holster("/lol/stats/<stat>/<champ>")
+def lol_stats_champ(stat, champ):
+    selected = champ
+    champions = get_champions()
+
+    level1 = {}
+    level18 = {}
+
+    for champ in champions:
+        level1[champ] = champ_stat_at(champions[champ], stat, 1)
+        level18[champ] = champ_stat_at(champions[champ], stat, 18)
+
+    l1stats = calculate(level1.values())
+    l18stats = calculate(level18.values())
+
+    champ1value = champ_stat_at(champions[selected], stat, 1)
+    champ18value = champ_stat_at(champions[selected], stat, 18)
+
+    champ1stats = {
+        "Value": champ1value,
+        "Stddev": value_to_stddev(l1stats["mean"], l1stats["stddev"],
+                                  champ1value),
+    }
+
+    champ18stats = {
+        "Value": champ18value,
+        "Stddev": value_to_stddev(l18stats["mean"], l18stats["stddev"],
+                                  champ18value),
+    }
+
+    d = {
+        "Level 1 Stats": l1stats,
+        "Level 18 Stats": l18stats,
+        selected: {
+            "Level 1 Stats": champ1stats,
+            "Level 18 Stats": champ18stats,
+        },
     }
     return d
 
