@@ -5,7 +5,7 @@ from flask.ext.holster.helpers import lift
 from flask.ext.holster.main import init_holster
 from flask.ext.holster.simple import html
 
-from lollerskates.blueprint import lol
+from lollerskates.blueprint import add_champ_converter, lol
 from tipsum import make_chains, make_text
 from wonders.wonders import Wonders, prettify
 
@@ -95,4 +95,5 @@ def index():
 
 
 # And finally hook up the blueprints.
+add_champ_converter(app)
 app.register_blueprint(lol, url_prefix="/lol")

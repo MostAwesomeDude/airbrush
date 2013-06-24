@@ -2,11 +2,13 @@ from collections import defaultdict
 from math import sqrt
 
 from werkzeug.contrib.cache import SimpleCache
+from werkzeug.routing import BaseConverter, ValidationError
 from flask import Blueprint, abort
 
 from flask.ext.holster.main import init_holster
 
 from lollerskates.analyze import champ_stat_at
+from lollerskates.formatting import canonical_champ
 from lollerskates.lol import get_champ_stats
 
 
@@ -30,26 +32,22 @@ def lol_raw():
     return champions
 
 
-@lol.holster("/raw/<champ>")
-def lol_raw_champ(champ):
+@lol.holster("/raw/<champ:c>")
+def lol_raw_champ(c):
     champions = get_champions()
-    if champ not in champions:
-        abort(404)
-    return champions[champ]
+    return champions.get(c, abort(400))
 
 
-@lol.holster("/cooked/<champ>")
-def lol_cooked_champ(champ):
+@lol.holster("/cooked/<champ:c>")
+def lol_cooked_champ(c):
     champions = get_champions()
-    if champ not in champions:
-        abort(404)
 
-    c = champions[champ]
+    champ = champions.get(c, abort(400))
 
     d = {
         "Champion": champ,
-        "Range": c["range"],
-        "Movement Speed": c["ms"],
+        "Range": champ["range"],
+        "Movement Speed": champ["ms"],
     }
     stats = {
         "ad": "Attack Damage",
@@ -63,11 +61,11 @@ def lol_cooked_champ(champ):
     }
 
     for stat in stats:
-        starting = champ_stat_at(c, stat, 1)
+        starting = champ_stat_at(champ, stat, 1)
         if starting == 0 and stat in ("mana", "mregen"):
             # Manaless champion.
             continue
-        ending = champ_stat_at(c, stat, 18)
+        ending = champ_stat_at(champ, stat, 18)
 
         skey = "%s at Level 1" % stats[stat]
         ekey = "%s at Level 18" % stats[stat]
@@ -159,9 +157,8 @@ def lol_stats(stat):
     return d
 
 
-@lol.holster("/stats/<stat>/<champ>")
-def lol_stats_champ(stat, champ):
-    selected = champ
+@lol.holster("/stats/<stat>/<champ:selected>")
+def lol_stats_champ(stat, selected):
     champions = get_champions()
 
     level1 = {}
@@ -203,3 +200,18 @@ def lol_stats_champ(stat, champ):
         },
     }
     return d
+
+
+def add_champ_converter(app):
+    class ChampConverter(BaseConverter):
+        def to_python(self, value):
+            cs = get_champions().keys()
+            champ = canonical_champ(cs, value)
+            if champ is None:
+                raise ValidationError()
+            return champ
+
+        def to_url(self, value):
+            return value
+
+    app.url_map.converters["champ"] = ChampConverter
