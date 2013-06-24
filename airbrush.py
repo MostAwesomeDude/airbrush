@@ -5,7 +5,7 @@ from math import sqrt
 
 from werkzeug.contrib.cache import SimpleCache
 
-from flask import Flask, abort, redirect, request, url_for
+from flask import Blueprint, Flask, abort, redirect, request, url_for
 from flask.ext.holster.helpers import lift
 from flask.ext.holster.main import init_holster
 from flask.ext.holster.simple import html
@@ -18,6 +18,9 @@ from wonders.wonders import Wonders, prettify
 app = Flask(__name__)
 app.debug = True
 init_holster(app)
+
+lol = Blueprint("lol", __name__)
+init_holster(lol)
 
 cache = SimpleCache()
 
@@ -93,13 +96,29 @@ def tipsum(length=3):
     return {"tipsum": sentences}
 
 
-@app.holster("/lol/raw")
+@app.holster("/")
+@html("index.html")
+def index():
+    return {
+        "stuff": {
+            "dnd": {
+                "wonders": url_for("wonders", _external=True),
+            },
+            "words": {
+                "elements": url_for("elements", _external=True),
+                "tipsum": url_for("tipsum", _external=True),
+            },
+        },
+    }
+
+
+@lol.holster("/raw")
 def lol_raw():
     champions = get_champions()
     return champions
 
 
-@app.holster("/lol/raw/<champ>")
+@lol.holster("/raw/<champ>")
 def lol_raw_champ(champ):
     champions = get_champions()
     if champ not in champions:
@@ -107,7 +126,7 @@ def lol_raw_champ(champ):
     return champions[champ]
 
 
-@app.holster("/lol/cooked/<champ>")
+@lol.holster("/cooked/<champ>")
 def lol_cooked_champ(champ):
     champions = get_champions()
     if champ not in champions:
@@ -147,7 +166,7 @@ def lol_cooked_champ(champ):
     return d
 
 
-@app.holster("/lol/height-chart/<stat>")
+@lol.holster("/height-chart/<stat>")
 def lol_height_chart(stat):
     champions = get_champions()
 
@@ -210,7 +229,7 @@ def stddev_to_percentile(stddev):
         return 90
 
 
-@app.holster("/lol/stats/<stat>")
+@lol.holster("/stats/<stat>")
 def lol_stats(stat):
     champions = get_champions()
 
@@ -228,7 +247,7 @@ def lol_stats(stat):
     return d
 
 
-@app.holster("/lol/stats/<stat>/<champ>")
+@lol.holster("/stats/<stat>/<champ>")
 def lol_stats_champ(stat, champ):
     selected = champ
     champions = get_champions()
@@ -274,19 +293,5 @@ def lol_stats_champ(stat, champ):
     return d
 
 
-@app.holster("/")
-@html("index.html")
-def index():
-    return {
-        "stuff": {
-            "dnd": {
-                "wonders": url_for("wonders", _external=True),
-            },
-            "lol": {
-            },
-            "words": {
-                "elements": url_for("elements", _external=True),
-                "tipsum": url_for("tipsum", _external=True),
-            },
-        },
-    }
+# And finally hook up the blueprints.
+app.register_blueprint(lol, url_prefix="/lol")
