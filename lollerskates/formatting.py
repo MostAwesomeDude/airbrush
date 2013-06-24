@@ -6,11 +6,13 @@ def canonical_champ(champs, needle):
     if needle in champs:
         return needle
 
+    lneedle = needle.lower()
+
     candidates = []
     for champ in champs:
-        if champ.lower() == needle:
+        if champ.lower() == lneedle:
             return champ
-        elif champ.lower().startswith(needle):
+        elif champ.lower().startswith(lneedle):
             candidates.append(champ)
 
     if len(candidates) == 1:
@@ -42,5 +44,5 @@ def canonical_champ(champs, needle):
         "yeti": "Nunu",
     }
 
-    if needle.lower() in nicknames:
-        return nicknames[needle.lower()]
+    if lneedle in nicknames:
+        return nicknames[lneedle]
