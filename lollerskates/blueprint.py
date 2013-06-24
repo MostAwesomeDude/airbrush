@@ -1,5 +1,7 @@
+from __future__ import division
+
 from collections import defaultdict
-from math import sqrt
+from math import floor, sqrt
 
 from werkzeug.contrib.cache import SimpleCache
 from werkzeug.routing import BaseConverter, ValidationError
@@ -104,10 +106,16 @@ def calculate(values):
                 / (len(values) - 1))
     stddev = sqrt(variance)
 
+    buckets = defaultdict(list)
+    for value in values:
+        k = floor(value_to_stddev(mean, stddev, value) * 2) / 2
+        buckets[k].append(value)
+
     rv = {
         "mean": mean,
         "variance": variance,
         "stddev": stddev,
+        "buckets": dict(buckets),
     }
     return rv
 
