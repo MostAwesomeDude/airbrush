@@ -9,7 +9,7 @@ from flask import Blueprint, abort
 
 from flask.ext.holster.main import init_holster
 
-from lollerskates.analyze import champ_stat_at
+from lollerskates.analyze import champ_stat_at, is_manaless
 from lollerskates.formatting import canonical_champ
 from lollerskates.lol import get_champ_stats
 
@@ -63,10 +63,11 @@ def lol_cooked_champ(c):
     }
 
     for stat in stats:
-        starting = champ_stat_at(champ, stat, 1)
-        if starting == 0 and stat in ("mana", "mregen"):
+        if is_manaless(c) and stat in ("mana", "mregen"):
             # Manaless champion.
             continue
+
+        starting = champ_stat_at(champ, stat, 1)
         ending = champ_stat_at(champ, stat, 18)
 
         skey = "%s at Level 1" % stats[stat]
@@ -87,6 +88,10 @@ def lol_height_chart(stat):
     for level in range(1, 19):
         healths = {}
         for champ in champions:
+            if is_manaless(champ) and stat in ("mana", "mregen"):
+                # Manaless champion.
+                continue
+
             health = champ_stat_at(champions[champ], stat, level)
             healths[champ] = health
 
@@ -155,6 +160,10 @@ def lol_stats(stat):
     level18 = {}
 
     for champ in champions:
+        if is_manaless(champ) and stat in ("mana", "mregen"):
+            # Manaless champion.
+            continue
+
         level1[champ] = champ_stat_at(champions[champ], stat, 1)
         level18[champ] = champ_stat_at(champions[champ], stat, 18)
 
@@ -167,6 +176,10 @@ def lol_stats(stat):
 
 @lol.holster("/stats/<stat>/<champ:selected>")
 def lol_stats_champ(stat, selected):
+    if is_manaless(selected) and stat in ("mana", "mregen"):
+        # Manaless champion.
+        return {selected: "<Manaless>"}
+
     champions = get_champions()
 
     level1 = {}
