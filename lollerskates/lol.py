@@ -75,13 +75,7 @@ def clauses_for_champs(champions):
     return clauses
 
 
-def clauses_for_items():
-    document = retrieve("Template:Items")
-
-    trs = document.xpath("//table/tr")[1:-3]
-    l = [x.text for tr in trs for x in tr.xpath("td/span/a/span")]
-    l.sort()
-
+def single_item(fragment):
     res = {
         "item_ad": "\+(\d+) attack damage",
         "item_ap": "\+(\d+) ability power",
@@ -97,23 +91,32 @@ def clauses_for_items():
         "item_spellvamp": "\+(\d+)% spell vamp",
     }
 
-    clauses = defaultdict(list)
+    name = "".join(c.lower() for c in fragment if c in ascii_letters)
+    effects = {}
+    document = retrieve(fragment)
+    for tr in document.xpath("//table/tr"):
+        text = tr.text_content()
+        for clause, regex in res.iteritems():
+            m = re.search(regex, text, re.M)
+            if m:
+                effects[clause] = m.groups()[0]
 
-    for i, item in enumerate(l):
-        name = "".join(c.lower() for c in item if c in ascii_letters)
-        clauses["item_name"].append("item(%d, %s)." % (i, name))
-        document = retrieve(item)
-        for tr in document.xpath("//table/tr"):
-            text = tr.text_content()
-            if "Effect" not in text:
-                continue
-            for clause, regex in res.iteritems():
-                m = re.search(regex, text, re.M)
-                if m:
-                    clauses[clause].append("%s(%d, %s)."
-                        % (clause, i, m.groups()[0]))
+    return name, effects
 
-    return clauses
+
+def clauses_for_items():
+    document = retrieve("Template:Items")
+
+    a = document.xpath("//table[position()<8]/tr/td/p/a")
+    l = [e.attrib["href"].split("/", 2)[2] for e in a]
+    l.sort()
+
+    rv = {}
+    for fragment in l:
+        k, v = single_item(fragment)
+        rv[k] = v
+    return rv
+
 
 
 def print_clauses(clauses, champions):
