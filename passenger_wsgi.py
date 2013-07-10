@@ -9,7 +9,7 @@ import sys
 from werkzeug.wsgi import DispatcherMiddleware
 from flask import Flask
 
-from airbrush import app as airbrush
+from airbrush.main import app as airbrush
 
 interpreter = os.path.expanduser("~/local/bin/python")
 if sys.executable != interpreter:

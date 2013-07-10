@@ -6,15 +6,17 @@ from flask.ext.holster.main import init_holster
 from flask.ext.holster.simple import html
 
 from lollerskates.blueprint import add_champ_converter, lol
-from tipsum import make_chains, make_text
-from wonders.wonders import Wonders, prettify
+
+from airbrush.elements import match_word
+from airbrush.tipsum import make_chains, make_text
+from airbrush.wonders import Wonders, prettify
 
 app = Flask(__name__)
 app.debug = True
 init_holster(app)
 
 w = Wonders()
-f = app.open_resource("wonders/wonders.txt")
+f = app.open_resource("wonders.txt")
 w.load_wonders(f)
 
 def no_cache(response):
@@ -58,7 +60,6 @@ def elements():
 @app.holster("/elements/<word>")
 @html("show_element.html")
 def show_element(word):
-    from elements import match_word
     matches = match_word(word)
     matches = [[x.capitalize() for x in match] for match in matches]
     return {"matches": matches}

@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from elements import match_word
+from airbrush.elements import match_word
 
 class TestMatchWord(TestCase):
 
