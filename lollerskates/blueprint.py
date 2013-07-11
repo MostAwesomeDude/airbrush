@@ -7,7 +7,7 @@ from werkzeug.contrib.cache import SimpleCache
 from werkzeug.routing import BaseConverter, ValidationError
 from flask import Blueprint, abort
 
-from flask.ext.holster.main import init_holster
+from flask.ext.holster.main import init_holster, with_template
 
 from lollerskates.analyze import champ_stat_at, is_manaless
 from lollerskates.formatting import canonical_champ
@@ -152,7 +152,34 @@ def stddev_to_percentile(stddev):
         return 90
 
 
+class SVGMaker(object):
+
+    template = """
+    <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+        <!-- Offset for X is -300, Y is flipped by 100 -->
+
+        <path stroke="blue" stroke-width="5" fill="none"
+              d="M 0,149
+                 C 100,168 200,72 300,50
+                 C 400,72 500,168 600,149" />
+
+        <rect x="0" y="50" width="100" height="100"
+              style="fill:blue;stroke:green;stroke-width:5;fill-opacity:0.5"
+              />
+
+        <line x1="0" y1="150" x2="600" y2="150"
+              style="stroke:black; stroke-width: 5" />
+        <line x1="300" y1="0" x2="300" y2="150"
+              style="stroke:black; stroke-width: 5" />
+    </svg>
+    """
+
+    def format(self, d):
+        return self.template
+
+
 @lol.holster("/stats/<stat>")
+@with_template("svg", SVGMaker())
 def lol_stats(stat):
     champions = get_champions()
 
