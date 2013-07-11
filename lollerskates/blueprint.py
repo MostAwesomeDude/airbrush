@@ -163,9 +163,7 @@ class SVGMaker(object):
                  C 100,168 200,72 300,50
                  C 400,72 500,168 600,149" />
 
-        <rect x="0" y="50" width="100" height="100"
-              style="fill:blue;stroke:green;stroke-width:5;fill-opacity:0.5"
-              />
+        %s
 
         <line x1="0" y1="150" x2="600" y2="150"
               style="stroke:black; stroke-width: 5" />
@@ -174,8 +172,34 @@ class SVGMaker(object):
     </svg>
     """
 
+    rect = """<rect %s
+    style="fill:blue;stroke:green;stroke-width:5;fill-opacity:0.5" />
+    """
+
+    def _make_rect(self, **kwargs):
+        l = []
+        for k, v in kwargs.iteritems():
+            l.append('%s="%s"' % (k, v))
+
+        return self.rect % " ".join(l)
+
     def format(self, d):
-        return self.template
+        buckets = d["Level 1 Stats"]["buckets"]
+        rects = []
+        total = sum(len(bucket) for bucket in buckets.iteritems())
+        for label, bucket in buckets.iteritems():
+            size = len(bucket)
+            # Height is 100, scaled by 1/sqrt(2pi) ~= 2.5066...
+            # 100 for now.
+            height = 100 * size // total
+            # The labels are half-stddev-sized. Multiply by 100 to get the
+            # width, and then adjust by moving them over to the offset mark.
+            x = int(label * 100) + 300
+            # And finally, remember that Y descends from above, so we need to
+            # flip on the Y-axis for positioning.
+            y = 150 - height
+            rects.append(self._make_rect(x=x, y=y, width=50, height=height))
+        return self.template % "\n".join(rects)
 
 
 @lol.holster("/stats/<stat>")
