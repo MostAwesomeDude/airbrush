@@ -1,5 +1,7 @@
 from __future__ import with_statement
 
+from time import time
+
 from flask import Flask, abort, redirect, request, url_for
 from flask.ext.holster.helpers import lift
 from flask.ext.holster.main import init_holster
@@ -77,6 +79,42 @@ def tipsum(length=3):
         words = make_text(heads, chains)
         sentences.append(u" ".join(words))
     return {"tipsum": sentences}
+
+
+@app.bare_holster("/nr")
+@lift(no_cache)
+@app.holsterize
+@html("nr.html")
+def nr():
+    offset = 6906 * 100000000 + 92 * 1000000 + 3 * 10000 + 33 * 100 + 33
+
+    milliseconds = int(time() * 1000)
+
+    # Newrem time is actually delightful. It is metric time, with centiseconds
+    # that tick at 1/90 the speed of Earth milliseconds.
+    result = milliseconds // 90 + offset
+    result, nr_seconds = divmod(result, 100)
+    result, nr_minutes = divmod(result, 100)
+    result, nr_hours = divmod(result, 100)
+    nr_years, nr_days = divmod(result, 100)
+
+    seasons = ["JA", "SA", "KA", "RA"]
+
+    if nr_days == 0:
+        date = "Frista"
+    elif nr_days == 99:
+        date = "Lanos"
+    else:
+        date = "%s%d" % (seasons[nr_days // 25], nr_days)
+
+    return {
+        "second": nr_seconds,
+        "minute": nr_minutes,
+        "hour": nr_hours,
+        "day": nr_days,
+        "date": date,
+        "year": nr_years,
+    }
 
 
 @app.holster("/")
