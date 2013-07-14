@@ -1,2 +1,3 @@
 <!DOCTYPE html>
-{{ d.year }} {{ d.date }} {{ d.hour }}:{{ d.minute }}
+{{ d.year }} {{ d.date }}
+{{ "%02d"|format(d.hour) }}:{{ "%02d"|format(d.minute) }}
