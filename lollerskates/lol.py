@@ -4,22 +4,16 @@ from collections import defaultdict
 import re
 from string import ascii_letters
 
-from lxml.html import fromstring
-import requests
+from airbrush.get import retrieve
 
 
-def retrieve(name):
-    print "Retrieving", name, "..."
+def get_wiki(name):
     url = "http://leagueoflegends.wikia.com/wiki/%s" % name
-    request = requests.get(url)
-    html = request.content
-    print "Parsing", name, "..."
-    document = fromstring(html)
-    return document
+    return retrieve(url)
 
 
 def get_champ_stats():
-    document = retrieve("Base_champion_statistics")
+    document = get_wiki("Base_champion_statistics")
 
     table = document.xpath("//table")[0]
 # In the future, if you ever need the magic incantation to get the table
@@ -93,7 +87,7 @@ def single_item(fragment):
 
     name = "".join(c.lower() for c in fragment if c in ascii_letters)
     effects = {}
-    document = retrieve(fragment)
+    document = get_wiki(fragment)
     for tr in document.xpath("//table/tr"):
         text = tr.text_content()
         for clause, regex in res.iteritems():
@@ -105,7 +99,7 @@ def single_item(fragment):
 
 
 def clauses_for_items():
-    document = retrieve("Template:Items")
+    document = get_wiki("Template:Items")
 
     a = document.xpath("//table[position()<8]/tr/td/p/a")
     l = [e.attrib["href"].split("/", 2)[2] for e in a]

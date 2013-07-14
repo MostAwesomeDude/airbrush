@@ -2,9 +2,9 @@ from __future__ import division
 
 from collections import defaultdict
 import random
-from urllib import urlopen
 
-from lxml.html.soupparser import fromstring
+from airbrush.get import retrieve
+
 
 EOS = object()
 
@@ -23,8 +23,7 @@ def is_eos(word):
 
 
 def make_stream():
-    page = urlopen("http://timecube.com/")
-    tree = fromstring(page.read())
+    tree = retrieve("http://timecube.com/")
 
     l = []
 
