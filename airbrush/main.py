@@ -1,10 +1,11 @@
-from __future__ import with_statement
+from __future__ import division, with_statement
 
+from math import cos, pi, sin
 from time import time
 
 from flask import Flask, abort, redirect, request, url_for
 from flask.ext.holster.helpers import lift
-from flask.ext.holster.main import init_holster
+from flask.ext.holster.main import init_holster, with_template
 from flask.ext.holster.simple import html
 
 from lollerskates.blueprint import add_champ_converter, lol
@@ -81,10 +82,40 @@ def tipsum(length=3):
     return {"tipsum": sentences}
 
 
+class SVGMaker(object):
+
+    template = """
+    <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+        <circle cx="50" cy="50" r="50" stroke="black" stroke-width="1"
+                fill="white" />
+
+        %s
+    </svg>
+    """
+
+    @staticmethod
+    def _aim(theta):
+        theta -= pi / 2
+        return cos(theta), sin(theta)
+
+    def _hand(self, amount, length):
+        theta = pi * amount / 50
+        x, y = self._aim(theta)
+        line = '<line x1="50" y1="50" x2="%d" y2="%d" stroke="black" />'
+        return line % (x * length + 50, y * length + 50)
+
+    def format(self, d):
+        hands = []
+        hands.append(self._hand(d["hour"], 30))
+        hands.append(self._hand(d["minute"], 40))
+        return self.template % "\n".join(hands)
+
+
 @app.bare_holster("/nr")
 @lift(no_cache)
 @app.holsterize
 @html("nr.html")
+@with_template("svg", SVGMaker())
 def nr():
     offset = 6906 * 100000000 + 92 * 1000000 + 3 * 10000 + 33 * 100 + 33
 
