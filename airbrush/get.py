@@ -4,19 +4,18 @@ import requests
 
 from werkzeug.contrib.cache import SimpleCache
 
-cache = SimpleCache()
+cache = SimpleCache(default_timeout=60 * 15)
 
 
 def retrieve(url):
-    cached = cache.get(url)
-    if cached is not None:
+    html = cache.get(url)
+    if html is None:
+        print "retrieve:", url, "cache miss"
+        request = requests.get(url)
+        html = request.content
+        cache.set(url, html)
+    else:
         print "retrieve:", url, "cache hit"
-        return cached
 
-    print "retrieve:", url, "cache miss"
-    request = requests.get(url)
-    html = request.content
     document = fromstring(html)
-
-    cache.set(url, document)
     return document
