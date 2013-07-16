@@ -164,18 +164,18 @@ class SVGMaker(object):
                  C 267,38  333,38  400,89
                  C 467,135 533,148 600,149" />
 
-        %s
+        <g fill="blue" stroke="green" stroke-width="5" fill-opacity="0.5">
+            %s
+        </g>
 
-        <line x1="0" y1="150" x2="600" y2="150"
-              style="stroke:black; stroke-width: 5" />
-        <line x1="300" y1="0" x2="300" y2="150"
-              style="stroke:black; stroke-width: 5" />
+        <g stroke="black" stroke-width="5">
+            <line x1="0" y1="150" x2="600" y2="150" />
+            <line x1="300" y1="0" x2="300" y2="150" />
+        </g>
     </svg>
     """
 
-    rect = """<rect %s
-    style="fill:blue;stroke:green;stroke-width:5;fill-opacity:0.5" />
-    """
+    rect = "<rect %s />"
 
     def _make_rect(self, **kwargs):
         l = []
