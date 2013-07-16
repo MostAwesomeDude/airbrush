@@ -169,8 +169,8 @@ class SVGMaker(object):
         </g>
 
         <g stroke="black" stroke-width="5">
-            <line x1="0" y1="150" x2="600" y2="150" />
-            <line x1="300" y1="0" x2="300" y2="150" />
+            <line x1="0"   y1="150" x2="600" y2="150" />
+            <line x1="300" y1="0"   x2="300" y2="150" />
         </g>
     </svg>
     """
