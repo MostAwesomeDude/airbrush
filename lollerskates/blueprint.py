@@ -12,6 +12,7 @@ from flask.ext.holster.main import init_holster, with_template
 from lollerskates.analyze import champ_stat_at, is_manaless
 from lollerskates.formatting import canonical_champ
 from lollerskates.lol import get_champ_stats
+from lollerskates.statistics import cdf
 
 
 lol = Blueprint("lol", __name__)
@@ -130,26 +131,8 @@ def value_to_stddev(mean, stddev, value):
 
 
 def stddev_to_percentile(stddev):
-    if stddev < -1.29:
-        return 0
-    elif stddev < -0.85:
-        return 10
-    elif stddev < -0.53:
-        return 20
-    elif stddev < -0.26:
-        return 30
-    elif stddev < 0:
-        return 40
-    elif stddev < 0.26:
-        return 50
-    elif stddev < 0.53:
-        return 60
-    elif stddev < 0.85:
-        return 70
-    elif stddev < 1.29:
-        return 80
-    else:
-        return 90
+    x = cdf(stddev)
+    return int(x * 100)
 
 
 class SVGMaker(object):
