@@ -4,7 +4,7 @@ import requests
 
 from werkzeug.contrib.cache import SimpleCache
 
-cache = SimpleCache(default_timeout=60 * 15)
+cache = SimpleCache(default_timeout=60 * 60)
 
 
 def retrieve(url):
