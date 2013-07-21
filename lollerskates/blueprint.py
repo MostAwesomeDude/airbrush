@@ -141,19 +141,21 @@ class SVGMaker(object):
     <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
         <!-- Offset for X is -300, Y is flipped by 100 -->
 
-        <path stroke="blue" stroke-width="5" fill="none"
-              d="M 0,149
-                 C 67,148  133,135 200,89
-                 C 267,38  333,38  400,89
-                 C 467,135 533,148 600,149" />
+        <g transform="scale(1, -1) translate(0, -150)">
+            <path stroke="blue" stroke-width="5" fill="none"
+                  d="M 0,1
+                     C 67,2    133,15  200,61
+                     C 267,112 333,112 400,61
+                     C 467,15  533,2   600,1" />
 
-        <g fill="blue" stroke="green" stroke-width="5" fill-opacity="0.5">
-            %s
-        </g>
+            <g fill="blue" stroke="green" stroke-width="5" fill-opacity="0.5">
+                %s
+            </g>
 
-        <g stroke="black" stroke-width="5">
-            <line x1="0"   y1="150" x2="600" y2="150" />
-            <line x1="300" y1="0"   x2="300" y2="150" />
+            <g stroke="black" stroke-width="5">
+                <line x1="0"   y1="0" x2="600" y2="0"   />
+                <line x1="300" y1="0" x2="300" y2="150" />
+            </g>
         </g>
     </svg>
     """
@@ -181,8 +183,7 @@ class SVGMaker(object):
             x = int(label * 100) + 300
             # And finally, remember that Y descends from above, so we need to
             # flip on the Y-axis for positioning.
-            y = 150 - height
-            rects.append(self._make_rect(x=x, y=y, width=50, height=height))
+            rects.append(self._make_rect(x=x, y=0, width=50, height=height))
         return self.template % "\n".join(rects)
 
 
