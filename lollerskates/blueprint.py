@@ -9,6 +9,7 @@ from werkzeug.routing import BaseConverter, ValidationError
 from flask import Blueprint, abort
 
 from flask.ext.holster.main import init_holster, with_template
+from flask.ext.holster.simple import html
 
 from lollerskates.analyze import champ_stat_at, is_manaless
 from lollerskates.formatting import canonical_champ, canonical_item
@@ -16,7 +17,7 @@ from lollerskates.lol import get_champ_stats, get_item_names, single_item
 from lollerskates.statistics import cdf
 
 
-lol = Blueprint("lol", __name__)
+lol = Blueprint("lol", __name__, template_folder="templates")
 init_holster(lol)
 
 cache = SimpleCache()
@@ -276,8 +277,9 @@ def lol_stats_champ(stat, selected):
 
 
 @lol.holster("/items")
+@html("items.html")
 def items():
-    return get_item_names()
+    return {"items": get_item_names()}
 
 
 @lol.holster("/items/<item:i>")

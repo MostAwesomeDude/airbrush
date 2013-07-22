@@ -1,0 +1,5 @@
+<ul>
+{% for item in d["items"] %}
+    <li><a href="{{ url_for("lol.item", i=item) }}">{{ item }}</a></li>
+{% endfor %}
+</ul>
