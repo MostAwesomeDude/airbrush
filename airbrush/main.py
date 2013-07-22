@@ -8,7 +8,8 @@ from flask.ext.holster.helpers import lift
 from flask.ext.holster.main import init_holster, with_template
 from flask.ext.holster.simple import html
 
-from lollerskates.blueprint import add_champ_converter, lol
+from lollerskates.blueprint import (add_item_converter, add_champ_converter,
+                                    lol)
 
 from airbrush.elements import match_word
 from airbrush.tipsum import make_chains, make_text
@@ -165,4 +166,5 @@ def index():
 
 # And finally hook up the blueprints.
 add_champ_converter(app)
+add_item_converter(app)
 app.register_blueprint(lol, url_prefix="/lol")

@@ -1,22 +1,34 @@
-def canonical_champ(champs, needle):
+def canonical(haystack, needle, nicknames):
     """
-    Get the actual champ name, or None.
+    Attempt to canonicalize a name based on an iterable of acceptable names
+    and a mapping of nicknames.
     """
 
-    if needle in champs:
+    if needle in haystack:
         return needle
 
     lneedle = needle.lower()
 
     candidates = []
-    for champ in champs:
-        if champ.lower() == lneedle:
-            return champ
-        elif champ.lower().startswith(lneedle):
-            candidates.append(champ)
+    for candidate in haystack:
+        if candidate.lower() == lneedle:
+            return candidate
+        elif candidate.lower().startswith(lneedle):
+            candidates.append(candidate)
 
     if len(candidates) == 1:
         return candidates[0]
+
+    if lneedle in nicknames:
+        return nicknames[lneedle]
+
+    return None
+
+
+def canonical_champ(champs, needle):
+    """
+    Get the actual champ name, or None.
+    """
 
     nicknames = {
         "bird":   "Anivia",
@@ -45,5 +57,12 @@ def canonical_champ(champs, needle):
         "yeti":   "Nunu",
     }
 
-    if lneedle in nicknames:
-        return nicknames[lneedle]
+    return canonical(champs, needle, nicknames)
+
+
+def canonical_item(items, needle):
+
+    nicknames = {
+    }
+
+    return canonical(items, needle, nicknames)

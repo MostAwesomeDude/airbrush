@@ -1,6 +1,7 @@
 from __future__ import division
 
 from collections import defaultdict
+from functools import wraps
 from math import floor, sqrt
 
 from werkzeug.contrib.cache import SimpleCache
@@ -10,8 +11,8 @@ from flask import Blueprint, abort
 from flask.ext.holster.main import init_holster, with_template
 
 from lollerskates.analyze import champ_stat_at, is_manaless
-from lollerskates.formatting import canonical_champ
-from lollerskates.lol import get_champ_stats
+from lollerskates.formatting import canonical_champ, canonical_item
+from lollerskates.lol import get_champ_stats, get_item_names
 from lollerskates.statistics import cdf
 
 
@@ -21,12 +22,27 @@ init_holster(lol)
 cache = SimpleCache()
 
 
+def caching(label):
+    def outer(f):
+        @wraps(f)
+        def inner(*args, **kwargs):
+            data = cache.get(label)
+            if data is None:
+                data = f(*args, **kwargs)
+                cache.set(label, data)
+            return data
+        return inner
+    return outer
+
+
+@caching("champions")
 def get_champions():
-    champs = cache.get("champions")
-    if not champs:
-        champs = get_champ_stats()
-        cache.set("champions", champs)
-    return champs
+    return get_champ_stats()
+
+
+@caching("item_names")
+def item_names():
+    return get_item_names()
 
 
 @lol.holster("/raw")
@@ -259,6 +275,11 @@ def lol_stats_champ(stat, selected):
     return d
 
 
+@lol.holster("/items")
+def items():
+    return get_item_names()
+
+
 def add_champ_converter(app):
     class ChampConverter(BaseConverter):
         def to_python(self, value):
@@ -272,3 +293,18 @@ def add_champ_converter(app):
             return value
 
     app.url_map.converters["champ"] = ChampConverter
+
+
+def add_item_converter(app):
+    class ItemConverter(BaseConverter):
+        def to_python(self, value):
+            items = get_item_names().keys()
+            item = canonical_item(items, value)
+            if item is None:
+                raise ValidationError()
+            return item
+
+        def to_url(self, value):
+            return value
+
+    app.url_map.converters["item"] = ItemConverter

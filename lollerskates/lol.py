@@ -98,19 +98,23 @@ def single_item(fragment):
     return name, effects
 
 
-def clauses_for_items():
+def get_item_names():
     document = get_wiki("Template:Items")
 
     a = document.xpath("//table[position()<8]/tr/td/p/a")
     l = [e.attrib["href"].split("/", 2)[2] for e in a]
     l.sort()
 
+    return l
+
+
+def clauses_for_items():
+    l = get_item_names()
     rv = {}
     for fragment in l:
         k, v = single_item(fragment)
         rv[k] = v
     return rv
-
 
 
 def print_clauses(clauses, champions):
