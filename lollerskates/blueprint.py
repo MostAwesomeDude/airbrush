@@ -12,7 +12,7 @@ from flask.ext.holster.main import init_holster, with_template
 
 from lollerskates.analyze import champ_stat_at, is_manaless
 from lollerskates.formatting import canonical_champ, canonical_item
-from lollerskates.lol import get_champ_stats, get_item_names
+from lollerskates.lol import get_champ_stats, get_item_names, single_item
 from lollerskates.statistics import cdf
 
 
@@ -280,6 +280,15 @@ def items():
     return get_item_names()
 
 
+@lol.holster("/items/<item:i>")
+def item(i):
+    item, effects = single_item(i)
+    return {
+        "item": item,
+        "effects": effects,
+    }
+
+
 def add_champ_converter(app):
     class ChampConverter(BaseConverter):
         def to_python(self, value):
@@ -298,7 +307,7 @@ def add_champ_converter(app):
 def add_item_converter(app):
     class ItemConverter(BaseConverter):
         def to_python(self, value):
-            items = get_item_names().keys()
+            items = get_item_names()
             item = canonical_item(items, value)
             if item is None:
                 raise ValidationError()
