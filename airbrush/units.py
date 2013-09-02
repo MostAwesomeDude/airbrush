@@ -1,42 +1,102 @@
+from __future__ import division
+
+
 def ukey(n):
-    cls = n.__class__
-    return cls.name, cls.abbreviation
+    return n.nums, n.denoms
 
 
-def add(self, other):
-    if ukey(self) != ukey(other):
-        raise TypeError("Unit mismatch")
+def balance(nums, denoms):
+    """
+    Cancel terms on a single fraction.
+    """
 
-    return self.__class__(self.n + other.n)
+    sn = sorted(nums)
+    sd = sorted(denoms)
 
+    i = 0
 
-def sub(self, other):
-    if ukey(self) != ukey(other):
-        raise TypeError("Unit mismatch")
+    while i < len(sn):
+        if sn[i] in sd:
+            sd.remove(sn[i])
+            sn.remove(sn[i])
+        else:
+            i += 1
 
-    return self.__class__(self.n - other.n)
-
-
-def init(self, n):
-    self.n = n
-
-
-def rep(self):
-    return "%r (%s)" % (self.n, self.abbreviation)
+    return tuple(sn), tuple(sd)
 
 
-def unit(name, abbreviation=None):
+class Unit(object):
+    """
+    The base type of all wrapped units.
+    """
+
+    def __init__(self, n):
+        self.n = n
+
+    def __repr__(self):
+        nums = "*".join(self.nums)
+        denoms = "*".join(self.denoms)
+
+        if not denoms:
+            label = nums
+        elif not nums:
+            label = "1/" + denoms
+        else:
+            label = "/".join([nums, denoms])
+
+        return "%r (%s)" % (self.n, label)
+
+    def __nonzero__(self):
+        return bool(self.n)
+
+    def __int__(self):
+        return int(self.n)
+
+    def __float__(self):
+        return float(self.n)
+
+    def __add__(self, other):
+        if ukey(self) != ukey(other):
+            raise TypeError("Unit mismatch")
+
+        return self.__class__(self.n + other.n)
+
+    def __sub__(self, other):
+        if ukey(self) != ukey(other):
+            raise TypeError("Unit mismatch")
+
+        return self.__class__(self.n - other.n)
+
+    def __mul__(self, other):
+        nums = self.nums + other.nums
+        denoms = self.denoms + other.denoms
+
+        cls = unit("Generated", nums=nums, denoms=denoms)
+
+        return cls(self.n * other.n)
+
+    def __truediv__(self, other):
+        # Division is just multiplication inverted.
+        nums = self.nums + other.denoms
+        denoms = self.denoms + other.nums
+
+        cls = unit("Generated", nums=nums, denoms=denoms)
+
+        return cls(self.n / other.n)
+
+    __div__ = __truediv__
+
+
+def unit(name, nums=(), denoms=()):
+
+    if not nums:
+        nums = name,
+
+    nums, denoms = balance(nums, denoms)
 
     members = {
-        "name": name,
-        "abbreviation": abbreviation or name,
-        "__init__": init,
-        "__repr__": rep,
-        "__nonzero__": lambda self: bool(self.n),
-        "__int__": lambda self: int(self.n),
-        "__float__": lambda self: float(self.n),
-        "__add__": add,
-        "__sub__": sub,
+        "nums": nums,
+        "denoms": denoms,
     }
 
-    return type(name, (object,), members)
+    return type(name, (Unit,), members)
